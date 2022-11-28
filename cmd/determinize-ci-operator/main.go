@@ -73,7 +73,17 @@ func main() {
 	if err := o.OperateOnCIOperatorConfigDir(o.ConfigDir, func(configuration *api.ReleaseBuildConfiguration, info *config.Info) error {
 		output := config.DataWithInfo{Configuration: *configuration, Info: *info}
 		if !o.Confirm {
-			output.Logger().Info("Would re-format file.")
+			if strings.Contains(info.Variant, "ci-4.13") ||
+				strings.Contains(info.Variant, "ci-4.12") {
+				logrus.Printf("------------- file name %s", info.Filename)
+				for _, test := range output.Configuration.Tests {
+					if test.MultiStageTestConfiguration != nil && test.MultiStageTestConfiguration.Observers == nil {
+						logrus.Printf("--------- adding observer to %s", test.As)
+
+					}
+				}
+			}
+			//output.Logger().Info("Would re-format file.")
 			return nil
 		}
 
@@ -88,6 +98,18 @@ func main() {
 		}
 		if o.enabledTemplateMigrations.StringSet().Has(OpenShiftInstallerTemplateName) && migratedCount <= o.templateMigrationCeiling {
 			migratedCount += migrateOpenShiftInstallerTemplates(&output, allowedBranches, allowedOrgs, allowedClusterProfiles)
+		}
+
+		if strings.Contains(info.Variant, "ci-4.13") ||
+			strings.Contains(info.Variant, "ci-4.12") {
+			logrus.Printf("------------- file name %s", info.Filename)
+			for _, test := range output.Configuration.Tests {
+				if test.MultiStageTestConfiguration != nil && test.MultiStageTestConfiguration.Observers == nil {
+					test.MultiStageTestConfiguration.Observers = &api.Observers{Enable: []string{"observers-resource-watch"}}
+					logrus.Printf("--------- adding observer to %s", test.As)
+
+				}
+			}
 		}
 
 		// we treat the filepath as the ultimate source of truth for this
