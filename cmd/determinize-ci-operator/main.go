@@ -74,7 +74,9 @@ func main() {
 		output := config.DataWithInfo{Configuration: *configuration, Info: *info}
 		if !o.Confirm {
 			if strings.Contains(info.Variant, "ci-4.13") ||
-				strings.Contains(info.Variant, "ci-4.12") {
+				strings.Contains(info.Variant, "ci-4.12") ||
+				strings.Contains(info.Variant, "nightly-4.13") ||
+				strings.Contains(info.Variant, "nightly-4.12") {
 				logrus.Printf("------------- file name %s", info.Filename)
 				for _, test := range output.Configuration.Tests {
 					if test.MultiStageTestConfiguration != nil && test.MultiStageTestConfiguration.Observers == nil {
@@ -101,7 +103,9 @@ func main() {
 		}
 
 		if strings.Contains(info.Variant, "ci-4.13") ||
-			strings.Contains(info.Variant, "ci-4.12") {
+			strings.Contains(info.Variant, "ci-4.12") ||
+			strings.Contains(info.Variant, "nightly-4.13") ||
+			strings.Contains(info.Variant, "nightly-4.12") {
 			logrus.Printf("------------- file name %s", info.Filename)
 			for _, test := range output.Configuration.Tests {
 				if test.MultiStageTestConfiguration != nil && test.MultiStageTestConfiguration.Observers == nil {
